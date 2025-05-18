@@ -1,18 +1,12 @@
-{
-  "builds": [
-    {
-      "src": "api/index.py",
-      "use": "@vercel/python",
-      "config": {
-        "maxLambdaSize": "50mb"
-      }
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "api/index.py"
-    }
-  ],
-  "buildCommand": "./vercel-build.sh"
-}
+   {
+     "builds": [
+       {
+         "src": "api/index.py",
+         "use": "@vercel/python"
+       }
+     ],
+     "env": {
+       "PYTHON_VERSION": "3.12"
+     }
+   }
+   

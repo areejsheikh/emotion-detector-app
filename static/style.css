@@ -1,0 +1,139 @@
+/* Custom styles to enhance Tailwind CSS */
+
+/* Dark theme with luxury feel */
+:root {
+    --primary: #6d28d9;
+    --primary-dark: #5b21b6;
+    --secondary: #10b981;
+    --bg-dark: #111827;
+    --card-dark: #1f2937;
+    --text-primary: #f3f4f6;
+    --text-secondary: #9ca3af;
+}
+
+body {
+    background: linear-gradient(135deg, var(--bg-dark) 0%, #0f172a 100%);
+    color: var(--text-primary);
+}
+
+/* Smooth transitions */
+.transition-all {
+    transition: all 0.3s ease-in-out;
+}
+
+/* Enhanced upload zone */
+.upload-zone {
+    border: 2px dashed #374151;
+    background: rgba(31, 41, 55, 0.5);
+    backdrop-filter: blur(8px);
+    transition: all 0.3s ease;
+}
+
+.upload-zone:hover {
+    border-color: var(--primary);
+    background: rgba(31, 41, 55, 0.8);
+    transform: translateY(-2px);
+}
+
+/* Enhanced button styles */
+.custom-button {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    box-shadow: 0 4px 15px -3px rgba(109, 40, 217, 0.3);
+    transform: translateY(0);
+    transition: all 0.2s ease;
+}
+
+.custom-button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px -4px rgba(109, 40, 217, 0.4);
+}
+
+.custom-button:disabled {
+    background: linear-gradient(135deg, #4b5563 0%, #374151 100%);
+}
+
+/* Image preview enhancements */
+.preview-image {
+    box-shadow: 0 4px 20px -4px rgba(0, 0, 0, 0.3);
+    border-radius: 12px;
+    transition: transform 0.3s ease;
+}
+
+.preview-image:hover {
+    transform: scale(1.02);
+}
+
+/* Results section enhancements */
+.result-card {
+    background: var(--card-dark);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    box-shadow: 0 4px 20px -4px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(8px);
+    transition: all 0.3s ease;
+}
+
+.result-card:hover {
+    box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.4);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Progress bars */
+.progress-bar {
+    height: 6px;
+    border-radius: 3px;
+    background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+    transition: width 0.6s ease;
+}
+
+.progress-bg {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Loading spinner enhancement */
+.spinner-backdrop {
+    backdrop-filter: blur(8px);
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.spinner {
+    border: 3px solid transparent;
+    border-top-color: var(--primary);
+    border-right-color: var(--secondary);
+}
+
+/* Container width adjustment */
+.container-custom {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 1.5rem;
+}
+
+/* Emotion result animation */
+.emotion-result {
+    animation: fadeInUp 0.5s ease-out;
+    background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: bold;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Glow effects */
+.glow-text {
+    text-shadow: 0 0 15px rgba(109, 40, 217, 0.3);
+}
+
+.glow-border {
+    box-shadow: 0 0 15px -5px rgba(109, 40, 217, 0.3);
+} 

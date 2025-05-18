@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emotion Detector | AI-Powered Analysis</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
+    <meta name="theme-color" content="#111827">
+</head>
+<body>
+    <div class="container-custom">
+        <div class="max-w-2xl mx-auto">
+            <!-- Header -->
+            <div class="text-center mb-10">
+                <h1 class="text-4xl font-bold mb-3 glow-text bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-emerald-500">
+                    Emotion Detector
+                </h1>
+                <p class="text-gray-400">Upload an image to reveal emotions with AI</p>
+            </div>
+
+            <!-- Upload Section -->
+            <div class="result-card p-6 mb-6">
+                <div class="mb-6">
+                    <div class="flex items-center justify-center w-full">
+                        <label class="flex flex-col w-full h-36 upload-zone rounded-xl cursor-pointer">
+                            <div class="flex flex-col items-center justify-center pt-7">
+                                <i class="fas fa-cloud-upload-alt fa-3x mb-3 text-purple-500"></i>
+                                <p class="text-sm text-gray-400">Drop your image here or click to browse</p>
+                                <p class="text-xs text-gray-500 mt-2">Supports JPG, PNG</p>
+                            </div>
+                            <input type="file" class="hidden" id="imageUpload" accept="image/*">
+                        </label>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <button id="predictBtn" class="custom-button text-white px-8 py-3 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                        <i class="fas fa-wand-magic-sparkles mr-2"></i>Detect Emotion
+                    </button>
+                </div>
+            </div>
+
+            <!-- Preview Section -->
+            <div id="previewSection" class="hidden result-card p-6 mb-6">
+                <h2 class="text-xl font-semibold mb-4 text-gray-200">Preview</h2>
+                <div class="flex justify-center mb-4">
+                    <img id="imagePreview" class="preview-image max-w-full h-auto max-h-64" src="" alt="Preview">
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div id="resultsSection" class="hidden result-card p-6">
+                <h2 class="text-xl font-semibold mb-4 text-gray-200">Analysis Results</h2>
+                <div class="space-y-6">
+                    <div class="flex items-center justify-between">
+                        <span class="text-lg font-medium text-gray-300">Detected Emotion:</span>
+                        <span id="emotionResult" class="text-xl emotion-result"></span>
+                    </div>
+                    <div class="space-y-4">
+                        <h3 class="font-medium text-gray-400">Confidence Levels</h3>
+                        <div id="confidenceScores" class="space-y-4"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading Spinner -->
+            <div id="loadingSpinner" class="hidden fixed top-0 left-0 w-full h-full spinner-backdrop flex items-center justify-center z-50">
+                <div class="bg-gray-900 p-8 rounded-2xl shadow-2xl flex flex-col items-center border border-gray-700">
+                    <div class="spinner animate-spin rounded-full h-12 w-12 border-4"></div>
+                    <p class="mt-4 text-gray-300 font-medium">Analyzing image...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const imageUpload = document.getElementById('imageUpload');
+            const predictBtn = document.getElementById('predictBtn');
+            const previewSection = document.getElementById('previewSection');
+            const imagePreview = document.getElementById('imagePreview');
+            const resultsSection = document.getElementById('resultsSection');
+            const emotionResult = document.getElementById('emotionResult');
+            const confidenceScores = document.getElementById('confidenceScores');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+
+            imageUpload.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        imagePreview.src = e.target.result;
+                        previewSection.classList.remove('hidden');
+                        predictBtn.disabled = false;
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            predictBtn.addEventListener('click', async function() {
+                loadingSpinner.classList.remove('hidden');
+                resultsSection.classList.add('hidden');
+
+                const formData = new FormData();
+                formData.append('file', imageUpload.files[0]);
+
+                try {
+                    const response = await fetch('/predict', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        emotionResult.textContent = `${data.emotion} (${(data.confidence * 100).toFixed(1)}%)`;
+                        
+                        confidenceScores.innerHTML = '';
+                        Object.entries(data.all_predictions)
+                            .sort((a, b) => b[1] - a[1])
+                            .forEach(([emotion, confidence]) => {
+                                const percentage = (confidence * 100).toFixed(1);
+                                confidenceScores.innerHTML += `
+                                    <div class="relative pt-1">
+                                        <div class="flex items-center justify-between mb-2">
+                                            <div class="text-sm font-medium text-gray-400">${emotion}</div>
+                                            <div class="text-sm font-medium text-gray-400">${percentage}%</div>
+                                        </div>
+                                        <div class="overflow-hidden h-2 text-xs flex rounded progress-bg">
+                                            <div class="progress-bar" style="width:${percentage}%"></div>
+                                        </div>
+                                    </div>
+                                `;
+                            });
+
+                        resultsSection.classList.remove('hidden');
+                    } else {
+                        alert('Error: ' + data.error);
+                    }
+                } catch (error) {
+                    alert('Error processing the image. Please try again.');
+                } finally {
+                    loadingSpinner.classList.add('hidden');
+                }
+            });
+
+            // Drag and drop functionality
+            const dropZone = document.querySelector('label');
+            
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, preventDefaults, false);
+            });
+
+            function preventDefaults (e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropZone.addEventListener(eventName, highlight, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, unhighlight, false);
+            });
+
+            function highlight(e) {
+                dropZone.classList.add('border-purple-500', 'bg-opacity-10', 'bg-purple-500');
+            }
+
+            function unhighlight(e) {
+                dropZone.classList.remove('border-purple-500', 'bg-opacity-10', 'bg-purple-500');
+            }
+
+            dropZone.addEventListener('drop', handleDrop, false);
+
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const file = dt.files[0];
+                imageUpload.files = dt.files;
+                const event = new Event('change');
+                imageUpload.dispatchEvent(event);
+            }
+        });
+    </script>
+</body>
+</html> 

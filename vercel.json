@@ -5,6 +5,12 @@
          "use": "@vercel/python"
        }
      ],
+     "routes": [
+       {
+         "src": "/(.*)",
+         "dest": "vercel-build.sh"
+       }
+     ],
      "env": {
        "PYTHON_VERSION": "3.12"
      }
